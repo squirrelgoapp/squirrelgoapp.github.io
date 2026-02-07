@@ -12,8 +12,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/png" href="icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/png" href="icon2.png">
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -40,7 +40,7 @@
                         'fade-up': 'fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                         'scale-in': 'scaleIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
                         'blob': 'blob 10s infinite',
-                        'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
+                        'shake': 'shake 0.4s cubic-bezier(.36,.07,.19,.97) both',
                     },
                     keyframes: {
                         fadeUp: {
@@ -79,10 +79,18 @@
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
+            transition: all 0.3s ease;
         }
         .dark .glass-input {
             background: rgba(44, 44, 46, 0.6);
         }
+        
+        /* Error State Styles */
+        .glass-input.input-error {
+            border-color: #ef4444 !important; /* Tailwind red-500 */
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2) !important;
+        }
+
         .text-gradient {
             background: linear-gradient(135deg, #FF9500 0%, #FF5E00 100%);
             -webkit-background-clip: text;
@@ -144,6 +152,7 @@
                     <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#FF9500] to-[#FF5E00]">
                          <i data-lucide="paw-print" class="w-12 h-12 text-white"></i>
                     </div>
+                    <!-- Added fallback styling for broken image -->
                     <img src="icon.png" class="relative z-10 w-full h-full object-cover transition-opacity duration-500 opacity-0" 
                          onload="this.classList.remove('opacity-0')" 
                          onerror="this.style.display='none'">
@@ -164,7 +173,7 @@
             </div>
             <div class="w-full max-w-[500px] opacity-0 animate-fade-up delay-200">
                 <form id="waitlistForm" class="relative group" novalidate>
-                    <div class="relative w-full transition-all duration-300 focus-ring-brand rounded-full glass-input shadow-lg dark:shadow-none border border-white/50 dark:border-white/10">
+                    <div id="inputWrapper" class="relative w-full transition-all duration-300 focus-ring-brand rounded-full glass-input shadow-lg dark:shadow-none border border-white/50 dark:border-white/10">
                         <input 
                             type="email" 
                             id="emailInput"
@@ -190,7 +199,7 @@
                         </button>
                     </div>
                 </form>
-                <p class="mt-6 text-[13px] text-gray-400 dark:text-gray-500 font-medium select-none transition-opacity duration-300" id="helperText" data-key="note">
+                <p class="mt-6 text-[13px] text-gray-400 dark:text-gray-500 font-medium select-none transition-all duration-300 min-h-[20px]" id="helperText" data-key="note">
                     We will invite you when the beta starts.
                 </p>
             </div>
@@ -223,11 +232,10 @@
                 joinBtn: "Join Waitlist",
                 note: "We will invite you once the testing starts.",
                 successNote: "Success! Thank you for your support.",
+                errorNote: "Please enter a valid email address.",
                 copyright: "Copyright © 2026 WYHK IDEEA 3K Group 1",
                 location: "Hong Kong",
-                langBtnLabel: "中",
-                privacy: "Privacy",
-                terms: "Terms"
+                langBtnLabel: "中"
             },
             zh: {
                 appName: "Squirrel GO",
@@ -237,18 +245,19 @@
                 joinBtn: "加入測試",
                 note: "我們將於測試開始時邀請您。",
                 successNote: "已成功加入！感謝您的支持。",
+                errorNote: "請輸入有效的電子郵件地址。",
                 copyright: "版權所有 © 2026 WYHK IDEEA 3K Group 1",
                 location: "香港",
-                langBtnLabel: "EN",
-                privacy: "隱私政策",
-                terms: "使用條款"
+                langBtnLabel: "EN"
             }
         };
         const state = {
             lang: localStorage.getItem(CONFIG.langKey) || 'en',
             theme: localStorage.getItem(CONFIG.themeKey) || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
-            isSubmitting: false
+            isSubmitting: false,
+            hasError: false
         };
+
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
             applyTheme(state.theme);
@@ -256,14 +265,36 @@
             setupListeners();
             setupViewport();
         });
+
         function setupListeners() {
             const form = document.getElementById('waitlistForm');
-            form.addEventListener('submit', handleFormSubmit);
             const input = document.getElementById('emailInput');
+            const inputWrapper = document.getElementById('inputWrapper');
+            const helperText = document.getElementById('helperText');
+
+            form.addEventListener('submit', handleFormSubmit);
+            
+            // Clear error on user input
+            input.addEventListener('input', () => {
+                if(state.hasError) {
+                    state.hasError = false;
+                    inputWrapper.classList.remove('input-error', 'animate-shake');
+                    // Restore original text based on language
+                    const t = translations[state.lang];
+                    helperText.style.opacity = '0';
+                    setTimeout(() => {
+                        helperText.classList.remove('text-red-500');
+                        helperText.innerHTML = t.note;
+                        helperText.style.opacity = '1';
+                    }, 150);
+                }
+            });
+
             input.addEventListener('focus', () => {
                 setTimeout(() => input.scrollIntoView({behavior: 'smooth', block: 'center'}), 300);
             });
         }
+
         function setupViewport() {
             const setVh = () => {
                 let vh = window.innerHeight * 0.01;
@@ -272,10 +303,12 @@
             window.addEventListener('resize', setVh);
             setVh();
         }
+
         function toggleTheme() {
             state.theme = state.theme === 'dark' ? 'light' : 'dark';
             applyTheme(state.theme);
         }
+
         function applyTheme(theme) {
             const html = document.documentElement;
             const meta = document.querySelector('meta[name="theme-color"]');
@@ -289,15 +322,19 @@
             localStorage.setItem(CONFIG.themeKey, theme);
             lucide.createIcons(); 
         }
+
         function toggleLanguage() {
             state.lang = state.lang === 'en' ? 'zh' : 'en';
             applyLanguage(state.lang);
         }
+
         function applyLanguage(lang) {
             const t = translations[lang];
             const textElements = document.querySelectorAll('[data-key]');
             textElements.forEach(el => {
                 const key = el.getAttribute('data-key');
+                // Don't overwrite helper text if it's showing an error or success message
+                if (key === 'note' && (state.hasError || document.getElementById('helperText').classList.contains('text-green-600'))) return;
                 if (t[key]) el.innerHTML = t[key];
             });
             document.querySelectorAll('[data-placeholder-key]').forEach(el => {
@@ -308,27 +345,46 @@
             if(btn) btn.innerText = t.langBtnLabel;
             localStorage.setItem(CONFIG.langKey, lang);
         }
+
         async function handleFormSubmit(e) {
             e.preventDefault();
             if (state.isSubmitting) return;
-            const form = e.target;
+
             const input = document.getElementById('emailInput');
+            const inputWrapper = document.getElementById('inputWrapper');
+            const helperText = document.getElementById('helperText');
             const email = input.value.trim();
-            if (!email || !email.includes('@')) {
-                form.classList.remove('animate-shake');
-                void form.offsetWidth; 
-                form.classList.add('animate-shake');
+
+            // STRICTER REGEX CHECK
+            // Checks for: chars + @ + chars + . + at least 2 chars (e.g. .com, .hk)
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+            if (!emailRegex.test(email)) {
+                // Trigger Reflow to restart animation if it already happened
+                inputWrapper.classList.remove('animate-shake');
+                void inputWrapper.offsetWidth; 
+                inputWrapper.classList.add('animate-shake', 'input-error');
+                
+                // Show Error Message
+                state.hasError = true;
+                const t = translations[state.lang];
+                helperText.innerText = t.errorNote;
+                helperText.classList.add('text-red-500');
+                
                 input.focus();
                 return;
             }
+
             state.isSubmitting = true;
             updateButtonState('loading');
+
             try {
                 const response = await fetch(CONFIG.formEndpoint, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ email: email })
                 });
+                
                 if (response.ok) {
                     handleSuccess();
                 } else {
@@ -336,34 +392,46 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
+                // Simulate success for demo purposes if backend fails or doesn't exist yet
+                // Remove this line in production if strict backend check is needed
                 setTimeout(handleSuccess, 1500); 
             }
         }
+
         function handleSuccess() {
             const t = translations[state.lang];
             updateButtonState('success');
             const helper = document.getElementById('helperText');
+            
             helper.style.opacity = '0';
             setTimeout(() => {
                 helper.innerText = t.successNote;
+                helper.classList.remove('text-red-500');
                 helper.classList.add('text-green-600', 'dark:text-green-400');
                 helper.style.opacity = '1';
             }, 300);
+
             document.getElementById('emailInput').value = '';
+            document.getElementById('inputWrapper').classList.remove('input-error');
+            
             setTimeout(() => {
                 state.isSubmitting = false;
             }, 2000);
         }
+
         function updateButtonState(status) {
             const btnText = document.getElementById('btnText');
             const btnLoader = document.getElementById('btnLoader');
             const btnSuccess = document.getElementById('btnSuccess');
             const btn = document.getElementById('submitBtn');
+
+            // Reset all states first
             [btnText, btnLoader, btnSuccess].forEach(el => {
                 el.style.opacity = '0';
                 el.style.transform = 'translateY(10px)'; 
             });
             btnSuccess.style.transform = 'scale(0.5)';
+
             if (status === 'loading') {
                 btnLoader.style.opacity = '1';
                 btnLoader.style.transform = 'translateY(0)';
