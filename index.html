@@ -1,9 +1,17 @@
 <!DOCTYPE html>
-<html lang="en" class="dark scroll-smooth">
+<html lang="en" class="scroll-smooth antialiased">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#F5F5F7">
+    <meta name="description" content="Transform Hong Kong into a virtual wilderness. Discover diverse squirrel species in Squirrel GO.">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Squirrel GO">
     <title>Squirrel GO</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -11,28 +19,48 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+                        sans: ['SF Pro Display', 'Inter', 'Noto Sans SC', 'system-ui', 'sans-serif'],
                     },
                     colors: {
-                        accent: {
-                            DEFAULT: '#FF9F0A',
-                            glow: '#FFD60A',
+                        brand: {
+                            DEFAULT: '#FF9500', 
+                            hover: '#FFB340',
+                            deep: '#E08200',
+                            glow: 'rgba(255, 149, 0, 0.5)'
                         },
                         surface: {
-                            light: '#ffffff',
-                            dark: '#121212', 
-                            cardLight: 'rgba(255, 255, 255, 0.6)',
-                            cardDark: 'rgba(28, 28, 30, 0.6)',
+                            light: '#F5F5F7', 
+                            dark: '#000000',
+                            card: 'rgba(255, 255, 255, 0.65)',
+                            cardDark: 'rgba(28, 28, 30, 0.65)'
                         }
                     },
                     animation: {
-                        'float': 'float 6s ease-in-out infinite',
-                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'fade-up': 'fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'scale-in': 'scaleIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+                        'blob': 'blob 10s infinite',
+                        'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
                     },
                     keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-10px)' },
+                        fadeUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        scaleIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.8)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        },
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        shake: {
+                            '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+                            '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+                            '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+                            '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
                         }
                     }
                 }
@@ -41,335 +69,314 @@
     </script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
-        html {
-            overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
+        html { -webkit-tap-highlight-color: transparent; }
+        body {
+            -webkit-font-smoothing: antialiased;
+            overscroll-behavior-y: none;
         }
-        body { 
-            -webkit-font-smoothing: antialiased; 
-            -moz-osx-font-smoothing: grayscale;
-            overflow-x: hidden;
-            width: 100%;
-        }
-        .reveal {
-            opacity: 0;
-            transform: translateY(20px) scale(0.98);
-            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-            filter: blur(4px);
-        }
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-            filter: blur(0);
-        }
-        .glass {
+        .glass-input {
             background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
-        .dark .glass {
-            background: rgba(20, 20, 20, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+        .dark .glass-input {
+            background: rgba(44, 44, 46, 0.6);
         }
-        .gradient-text {
-            background: linear-gradient(135deg, #FF9F0A 0%, #FFD60A 50%, #FF9F0A 100%);
-            background-size: 200% auto;
+        .text-gradient {
+            background: linear-gradient(135deg, #FF9500 0%, #FF5E00 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: shine 4s linear infinite;
+            background-clip: text;
         }
-        @keyframes shine {
-            to { background-position: 200% center; }
+        .dark .text-gradient {
+            background: linear-gradient(135deg, #FFB340 0%, #FF8800 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
         }
         .ambient-glow {
             position: fixed;
             width: 600px;
             height: 600px;
+            background: radial-gradient(circle, rgba(255, 149, 0, 0.08) 0%, rgba(255, 255, 255, 0) 70%);
             border-radius: 50%;
-            filter: blur(100px);
-            z-index: -1;
-            opacity: 0.15;
             pointer-events: none;
+            z-index: -1;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
-        /* Fix for mobile landscape height issues */
-        @media (max-height: 700px) {
-            .ambient-glow { opacity: 0.1; }
-            .reveal { transition-duration: 0.5s; }
+        .dark .ambient-glow {
+            background: radial-gradient(circle, rgba(255, 149, 0, 0.12) 0%, rgba(0, 0, 0, 0) 70%);
         }
+        .active-scale:active { transform: scale(0.95); }
+        .focus-ring-brand:focus-within {
+            box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.25);
+            border-color: #FF9500;
+        }
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+        .safe-pt { padding-top: env(safe-area-inset-top, 20px); }
+        .safe-pb { padding-bottom: env(safe-area-inset-bottom, 20px); }
     </style>
 </head>
-<body class="bg-[#F5F5F7] dark:bg-[#000000] text-gray-900 dark:text-[#F5F5F7] transition-colors duration-500 relative min-h-screen flex flex-col w-full">
-    
-    <!-- Background Elements -->
-    <div class="ambient-glow bg-orange-500 top-[-200px] left-1/2 -translate-x-1/2"></div>
-    <div class="ambient-glow bg-blue-500 bottom-[-200px] right-[-100px] w-[400px] h-[400px]"></div>
-
-    <!-- Top Navigation -->
-    <div class="absolute top-0 w-full flex justify-end p-6 z-50">
-        <div class="flex items-center gap-3">
-            <button onclick="toggleLanguage()" class="w-10 h-10 rounded-full bg-white/50 dark:bg-black/20 backdrop-blur-md border border-gray-200/50 dark:border-white/10 shadow-sm flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-300 hover:scale-105 hover:bg-white/80 dark:hover:bg-white/10 transition-all" id="langBtn" aria-label="Toggle Language">
-                中
-            </button>
-            <button onclick="toggleTheme()" class="w-10 h-10 rounded-full bg-white/50 dark:bg-black/20 backdrop-blur-md border border-gray-200/50 dark:border-white/10 shadow-sm flex items-center justify-center text-gray-600 dark:text-gray-300 hover:scale-105 hover:bg-white/80 dark:hover:bg-white/10 transition-all" aria-label="Toggle Theme">
-                <i data-lucide="moon" class="w-4 h-4 hidden dark:block text-yellow-400 fill-yellow-400"></i>
-                <i data-lucide="sun" class="w-4 h-4 block dark:hidden text-orange-500 fill-orange-500"></i>
-            </button>
-        </div>
+<body class="bg-[#F2F2F7] dark:bg-black text-[#1D1D1F] dark:text-[#F5F5F7] transition-colors duration-500 min-h-[100dvh] flex flex-col overflow-x-hidden relative">
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="ambient-glow animate-blob"></div>
+        <div class="ambient-glow animate-blob" style="top: 20%; left: 20%; width: 400px; height: 400px; animation-delay: 2s;"></div>
+        <div class="ambient-glow animate-blob" style="top: 80%; left: 80%; width: 500px; height: 500px; animation-delay: 4s;"></div>
     </div>
-
-    <!-- Main Content -->
-    <main class="flex-grow flex flex-col items-center justify-center px-4 sm:px-6 w-full max-w-7xl mx-auto py-20 md:py-0">
-        <div class="flex flex-col items-center text-center max-w-4xl mx-auto z-10 w-full">
-            
-            <!-- Icon -->
-            <div class="reveal relative group mb-6 md:mb-8 animate-float">
-                <div class="absolute inset-0 bg-orange-500/30 blur-[40px] rounded-full scale-110 group-hover:scale-125 transition-transform duration-700"></div>
-                <div class="relative w-28 h-28 md:w-40 md:h-40 rounded-[2rem] md:rounded-[2.2rem] overflow-hidden shadow-2xl bg-gradient-to-br from-gray-100 to-gray-300 dark:from-[#2c2c2e] dark:to-[#1c1c1e]">
-                    <img 
-                        src="icon.png" 
-                        alt="App Icon"
-                        class="w-full h-full object-cover"
-                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                    >
-                    <div class="hidden w-full h-full flex flex-col items-center justify-center text-accent">
-                        <i data-lucide="nut" class="w-12 h-12 md:w-14 md:h-14 mb-2 stroke-[1.5]"></i>
+    <div class="fixed top-0 right-0 z-50 p-6 safe-pt flex items-center gap-3">
+        <button onclick="toggleLanguage()" class="w-10 h-10 rounded-full bg-white/40 dark:bg-white/10 flex items-center justify-center text-[13px] font-semibold transition-all active-scale hover:bg-white/60 dark:hover:bg-white/20 outline-none focus:ring-2 focus:ring-brand/50 backdrop-blur-md shadow-sm border border-white/20 dark:border-white/5" id="langBtn" aria-label="Switch Language">
+            中
+        </button>
+        <button onclick="toggleTheme()" class="w-10 h-10 rounded-full bg-white/40 dark:bg-white/10 flex items-center justify-center transition-all active-scale hover:bg-white/60 dark:hover:bg-white/20 outline-none focus:ring-2 focus:ring-brand/50 backdrop-blur-md shadow-sm border border-white/20 dark:border-white/5" aria-label="Toggle Theme">
+            <i data-lucide="moon" class="w-4 h-4 hidden dark:block text-yellow-400"></i>
+            <i data-lucide="sun" class="w-4 h-4 block dark:hidden text-orange-500"></i>
+        </button>
+    </div>
+    <main class="flex-grow flex flex-col items-center justify-center px-6 w-full max-w-7xl mx-auto pt-[calc(20px+env(safe-area-inset-top))] pb-[calc(40px+env(safe-area-inset-bottom))] text-center min-h-screen relative z-10">
+        <div class="w-full max-w-[980px] mx-auto flex flex-col items-center justify-center gap-8 sm:gap-12">
+            <div class="opacity-0 animate-scale-in origin-center relative">
+                <div class="absolute inset-0 bg-brand/30 blur-2xl rounded-full transform scale-150 opacity-50 dark:opacity-30"></div>
+                <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-[24px] sm:rounded-[32px] bg-white dark:bg-[#1C1C1E] shadow-2xl dark:shadow-brand/10 ring-1 ring-black/5 dark:ring-white/10 flex items-center justify-center relative group overflow-hidden transition-transform duration-500 hover:scale-105 active:scale-95">
+                    <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#FF9500] to-[#FF5E00]">
+                         <i data-lucide="paw-print" class="w-12 h-12 text-white"></i>
                     </div>
+                    <img src="icon.png" class="relative z-10 w-full h-full object-cover transition-opacity duration-500 opacity-0" 
+                         onload="this.classList.remove('opacity-0')" 
+                         onerror="this.style.display='none'">
+                    <div class="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent pointer-events-none z-20"></div>
                 </div>
             </div>
-
-            <!-- Headings -->
-            <div class="reveal delay-100 space-y-3 md:space-y-4 px-2">
-                <h2 class="text-orange-600 dark:text-orange-500 font-semibold tracking-widest uppercase text-xs md:text-sm lg:text-base" data-key="intro">
-                    Coming Soon
-                </h2>
-                <h1 class="text-4xl sm:text-6xl md:text-8xl font-bold tracking-tight text-gray-900 dark:text-white leading-[0.95] md:leading-[0.9]">
-                    <span data-key="appName" class="gradient-text">Squirrel GO</span>
+            <div class="space-y-4 sm:space-y-6 opacity-0 animate-fade-up delay-100 max-w-4xl">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand/10 dark:bg-brand/20 border border-brand/20 text-brand-deep dark:text-brand font-medium text-[11px] sm:text-xs uppercase tracking-wider mb-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-brand animate-pulse"></span>
+                    <span data-key="taglineHeader">Coming Soon</span>
+                </div>
+                <h1 class="text-5xl xs:text-6xl sm:text-7xl md:text-8xl font-bold tracking-tighter leading-[0.9] select-none">
+                    <span class="text-gradient" data-key="appName">Squirrel GO</span>
                 </h1>
-                <p class="text-base sm:text-lg md:text-2xl text-gray-500 dark:text-gray-400 font-normal leading-relaxed max-w-xl mx-auto mt-4 md:mt-6 px-4" data-key="tagline">
+                <p class="text-[18px] xs:text-[20px] sm:text-[24px] leading-relaxed text-gray-500 dark:text-gray-400 max-w-2xl mx-auto font-normal tracking-tight" data-key="tagline">
                     Transform Hong Kong into a virtual wilderness, <br class="hidden sm:block">where players discover diverse squirrel species!
                 </p>
             </div>
-
-            <!-- Waitlist Form -->
-            <div id="waitlist-section" class="reveal delay-200 mt-8 md:mt-10 w-full max-w-lg md:max-w-2xl relative z-20 px-2 sm:px-0">
-                <div class="glass p-1.5 md:p-2 rounded-[20px] flex flex-col sm:flex-row gap-2 shadow-xl shadow-orange-500/5">
-                    <input 
-                        type="email" 
-                        id="emailInput"
-                        placeholder="Enter your email" 
-                        class="flex-1 bg-transparent border-none outline-none px-4 py-3 md:py-4 text-base md:text-lg text-gray-900 dark:text-white placeholder-gray-400 focus:ring-0 min-w-0 text-center sm:text-left rounded-xl sm:rounded-none focus:bg-white/10 transition-colors"
-                        data-placeholder-key="emailPlaceholder"
-                    >
-                    <button 
-                        onclick="joinWaitlist()"
-                        class="bg-gray-900 dark:bg-white text-white dark:text-black font-semibold rounded-2xl px-6 py-3 md:py-3.5 text-base md:text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] whitespace-nowrap flex items-center justify-center gap-2 shadow-lg sm:shadow-none"
-                        id="joinBtn"
-                    >
-                        <span data-key="joinBtn">Join Waitlist</span>
-                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                    </button>
-                </div>
-                
-                <div id="feedback" class="absolute top-full left-0 w-full mt-2 text-center text-sm font-medium h-5 opacity-0 transition-opacity duration-300"></div>
-                
-                <div class="reveal delay-150 mt-8 max-w-xl w-full mx-auto">
-                    <p class="text-xs md:text-sm text-orange-600/90 dark:text-orange-400/90 font-medium bg-orange-100/50 dark:bg-orange-900/20 px-4 py-2.5 rounded-lg border border-orange-200 dark:border-orange-800/50 leading-relaxed" data-key="betaNote">
-                        The app is still under development. We will invite you via email once the beta test begins.
-                    </p>
-                </div>
+            <div class="w-full max-w-[500px] opacity-0 animate-fade-up delay-200">
+                <form id="waitlistForm" class="relative group" novalidate>
+                    <div class="relative w-full transition-all duration-300 focus-ring-brand rounded-full glass-input shadow-lg dark:shadow-none border border-white/50 dark:border-white/10">
+                        <input 
+                            type="email" 
+                            id="emailInput"
+                            name="email"
+                            required
+                            enterkeyhint="go"
+                            placeholder="name@example.com"
+                            class="w-full h-[60px] sm:h-[64px] pl-6 pr-[140px] rounded-full bg-transparent text-[17px] text-[#1D1D1F] dark:text-white placeholder-gray-400 dark:placeholder-gray-500 outline-none transition-all appearance-none"
+                            data-placeholder-key="emailPlaceholder"
+                        >
+                        <button 
+                            type="submit" 
+                            id="submitBtn"
+                            class="absolute right-1.5 top-1.5 bottom-1.5 w-[130px] rounded-full bg-[#1D1D1F] dark:bg-white text-white dark:text-black hover:bg-brand hover:dark:bg-brand hover:text-white hover:dark:text-white text-[15px] font-semibold transition-all duration-300 active-scale shadow-md disabled:opacity-80 disabled:cursor-not-allowed flex items-center justify-center overflow-hidden"
+                        >
+                            <span class="transition-transform duration-300" id="btnText" data-key="joinBtn">Join Waitlist</span>
+                            <div class="absolute inset-0 flex items-center justify-center opacity-0 translate-y-8 transition-all duration-300" id="btnLoader">
+                                <i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i>
+                            </div>
+                            <div class="absolute inset-0 flex items-center justify-center opacity-0 scale-50 transition-all duration-300" id="btnSuccess">
+                                <i data-lucide="check" class="w-5 h-5"></i>
+                            </div>
+                        </button>
+                    </div>
+                </form>
+                <p class="mt-6 text-[13px] text-gray-400 dark:text-gray-500 font-medium select-none transition-opacity duration-300" id="helperText" data-key="note">
+                    We will invite you when the beta starts.
+                </p>
             </div>
         </div>
     </main>
-
-    <!-- Footer -->
-    <footer class="py-6 text-center border-t border-gray-200/50 dark:border-white/5 glass w-full mt-auto">
-        <div class="flex flex-col gap-1.5 px-4">
-            <p class="text-[10px] md:text-xs text-gray-400 dark:text-gray-600 tracking-wide">
-                <span data-key="copyright">© 2026 WYHK IDEEA 3K Group 1.</span>
-            </p>
-            <div class="flex items-center justify-center gap-2 text-[9px] md:text-[10px] text-gray-300 dark:text-gray-700 uppercase tracking-widest font-bold">
-                <span data-key="location">Made in Hong Kong</span>
+    <footer class="w-full py-8 text-center bg-transparent safe-pb relative z-10">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col items-center gap-4 text-[12px] font-medium text-gray-400/80 dark:text-gray-600">
+            <div class="flex flex-col sm:flex-row items-center gap-2">
+                <span data-key="copyright">Copyright © 2026 WYHK IDEEA 3K Group 1</span>
+                <span class="hidden sm:inline text-gray-300 dark:text-gray-700">•</span>
+                <div class="flex items-center gap-1.5">
+                    <i data-lucide="map-pin" class="w-3 h-3 text-brand"></i>
+                    <span data-key="location">Made in Hong Kong</span>
+                </div>
             </div>
         </div>
     </footer>
-
     <script>
+        const CONFIG = {
+            langKey: 's_lang',
+            themeKey: 's_theme',
+            formEndpoint: 'https://formspree.io/f/mbdajrll' 
+        };
         const translations = {
             en: {
                 appName: "Squirrel GO",
-                navWaitlist: "Get Early Access",
-                intro: "Stay Tuned For",
-                tagline: "Transform Hong Kong into a virtual wilderness, \nwhere players discover diverse squirrel species!",
-                betaNote: "The app is under development. We will invite you via email once the testing begins.",
-                emailPlaceholder: "Email Address",
+                taglineHeader: "Coming Soon",
+                tagline: "Transform Hong Kong into a virtual wilderness, <br class='hidden sm:block'>where players discover diverse squirrel species!",
+                emailPlaceholder: "Email address",
                 joinBtn: "Join Waitlist",
-                joinBtnLoading: "Processing...",
-                joinBtnSuccess: "You're In!",
-                feedbackError: "Please enter a valid email address.",
-                feedbackSuccess: "We've added you to the list!",
-                copyright: "© 2026 WYHK IDEEA 3K Group 1. All rights reserved.",
-                location: "Made in Hong Kong",
+                note: "We will invite you once the testing starts.",
+                successNote: "Success! Thank you for your support.",
+                copyright: "Copyright © 2026 WYHK IDEEA 3K Group 1",
+                location: "Hong Kong",
                 langBtnLabel: "中",
+                privacy: "Privacy",
+                terms: "Terms"
             },
             zh: {
                 appName: "Squirrel GO",
-                navWaitlist: "搶先體驗",
-                intro: "敬請期待",
-                tagline: "將香港打造成虛擬自然世界，\n讓玩家置身其中發掘各種松鼠品種！",
-                betaNote: "應用程式仍在開發中，測試開始後將以電子郵件邀請您。",
-                emailPlaceholder: "電子郵件地址",
-                joinBtn: "加入測試名單",
-                joinBtnLoading: "處理中...",
-                joinBtnSuccess: "成功加入",
-                feedbackError: "請輸入有效的電子郵件地址。",
-                feedbackSuccess: "已成功加入！我們將盡快通知您。",
+                taglineHeader: "即將推出",
+                tagline: "將香港打造成虛擬自然世界，<br class='hidden sm:block'>讓玩家置身其中發掘各種松鼠品種！",
+                emailPlaceholder: "輸入您的電子郵件",
+                joinBtn: "加入測試",
+                note: "我們將於測試開始時邀請您。",
+                successNote: "已成功加入！感謝您的支持。",
                 copyright: "版權所有 © 2026 WYHK IDEEA 3K Group 1",
-                location: "香港製造",
+                location: "香港",
                 langBtnLabel: "EN",
+                privacy: "隱私政策",
+                terms: "使用條款"
             }
         };
-        let currentLang = localStorage.getItem('lang') || 'en';
-        let currentTheme = localStorage.getItem('theme') || 'dark';
-        
+        const state = {
+            lang: localStorage.getItem(CONFIG.langKey) || 'en',
+            theme: localStorage.getItem(CONFIG.themeKey) || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+            isSubmitting: false
+        };
         document.addEventListener('DOMContentLoaded', () => {
-            if (window.lucide) lucide.createIcons();
-            applyTheme(currentTheme);
-            applyLanguage(currentLang);
-            // Delay scroll reveal slightly to ensure layout is settled
-            setTimeout(initScrollReveal, 100);
+            lucide.createIcons();
+            applyTheme(state.theme);
+            applyLanguage(state.lang);
+            setupListeners();
+            setupViewport();
         });
-
-        function toggleTheme() {
-            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            applyTheme(currentTheme);
+        function setupListeners() {
+            const form = document.getElementById('waitlistForm');
+            form.addEventListener('submit', handleFormSubmit);
+            const input = document.getElementById('emailInput');
+            input.addEventListener('focus', () => {
+                setTimeout(() => input.scrollIntoView({behavior: 'smooth', block: 'center'}), 300);
+            });
         }
-
+        function setupViewport() {
+            const setVh = () => {
+                let vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            };
+            window.addEventListener('resize', setVh);
+            setVh();
+        }
+        function toggleTheme() {
+            state.theme = state.theme === 'dark' ? 'light' : 'dark';
+            applyTheme(state.theme);
+        }
         function applyTheme(theme) {
             const html = document.documentElement;
-            if (theme === 'dark') html.classList.add('dark');
-            else html.classList.remove('dark');
-            localStorage.setItem('theme', theme);
+            const meta = document.querySelector('meta[name="theme-color"]');
+            if (theme === 'dark') {
+                html.classList.add('dark');
+                if(meta) meta.setAttribute('content', '#000000');
+            } else {
+                html.classList.remove('dark');
+                if(meta) meta.setAttribute('content', '#F5F5F7');
+            }
+            localStorage.setItem(CONFIG.themeKey, theme);
+            lucide.createIcons(); 
         }
-
         function toggleLanguage() {
-            currentLang = currentLang === 'en' ? 'zh' : 'en';
-            applyLanguage(currentLang);
+            state.lang = state.lang === 'en' ? 'zh' : 'en';
+            applyLanguage(state.lang);
         }
-
         function applyLanguage(lang) {
             const t = translations[lang];
-            document.querySelectorAll('[data-key]').forEach(el => {
+            const textElements = document.querySelectorAll('[data-key]');
+            textElements.forEach(el => {
                 const key = el.getAttribute('data-key');
-                if (t[key]) el.innerText = t[key];
+                if (t[key]) el.innerHTML = t[key];
             });
             document.querySelectorAll('[data-placeholder-key]').forEach(el => {
                 const key = el.getAttribute('data-placeholder-key');
                 if (t[key]) el.placeholder = t[key];
             });
-            document.getElementById('langBtn').innerText = t.langBtnLabel;
-            localStorage.setItem('lang', lang);
+            const btn = document.getElementById('langBtn');
+            if(btn) btn.innerText = t.langBtnLabel;
+            localStorage.setItem(CONFIG.langKey, lang);
         }
-
-        function initScrollReveal() {
-            const reveals = document.querySelectorAll('.reveal');
-            
-            // Initial check
-            checkReveal();
-
-            // Check on scroll
-            window.addEventListener('scroll', checkReveal);
-            
-            function checkReveal() {
-                const triggerBottom = window.innerHeight * 0.95;
-                reveals.forEach(reveal => {
-                    const boxTop = reveal.getBoundingClientRect().top;
-                    if (boxTop < triggerBottom) reveal.classList.add('active');
-                });
-            }
-        }
-
-        function joinWaitlist() {
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            if (state.isSubmitting) return;
+            const form = e.target;
             const input = document.getElementById('emailInput');
-            const feedback = document.getElementById('feedback');
-            const btn = document.getElementById('joinBtn');
-            const span = btn.querySelector('span');
-            const icon = btn.querySelector('svg') || btn.querySelector('i'); 
-            const t = translations[currentLang];
-            const email = input.value;
-            
-            feedback.style.opacity = '0';
-            input.classList.remove('border-red-500', 'text-red-500');
-            
+            const email = input.value.trim();
             if (!email || !email.includes('@')) {
-                feedback.textContent = t.feedbackError;
-                feedback.style.color = "#ef4444";
-                feedback.style.opacity = "1";
+                form.classList.remove('animate-shake');
+                void form.offsetWidth; 
+                form.classList.add('animate-shake');
+                input.focus();
                 return;
             }
-            
-            const originalText = span.innerText;
-            span.innerText = t.joinBtnLoading;
-            if (icon) icon.style.display = 'none'; 
-            btn.disabled = true;
-            btn.classList.add('opacity-80', 'cursor-not-allowed');
-            
-            fetch("https://formspree.io/f/mbdajrll", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
-                },
-                body: JSON.stringify({ email: email })
-            })
-            .then(response => {
+            state.isSubmitting = true;
+            updateButtonState('loading');
+            try {
+                const response = await fetch(CONFIG.formEndpoint, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email: email })
+                });
                 if (response.ok) {
-                    span.innerText = t.joinBtnSuccess;
-                    btn.className = "bg-green-500 text-white font-semibold rounded-2xl px-6 py-3 text-base md:text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] whitespace-nowrap flex items-center justify-center gap-2 shadow-lg sm:shadow-none";
-                    feedback.textContent = t.feedbackSuccess;
-                    feedback.style.color = "#22c55e";
-                    feedback.style.opacity = "1";
-                    input.value = ""; 
-                    setTimeout(() => {
-                        resetButtonState(btn, icon, currentTheme);
-                    }, 3000);
+                    handleSuccess();
                 } else {
-                    response.json().then(data => {
-                        if (Object.hasOwn(data, 'errors')) {
-                            feedback.textContent = data.errors.map(error => error.message).join(", ");
-                        } else {
-                            feedback.textContent = "Oops! Problem submitting form.";
-                        }
-                        feedback.style.color = "#ef4444";
-                        feedback.style.opacity = "1";
-                        resetButtonState(btn, icon, currentTheme);
-                    });
+                    throw new Error('Submission failed');
                 }
-            })
-            .catch(error => {
-                console.error("Fetch Error:", error);
-                feedback.textContent = "Network error. Please try again.";
-                feedback.style.color = "#ef4444";
-                feedback.style.opacity = "1";
-                resetButtonState(btn, icon, currentTheme);
-            });
-        }
-
-        function resetButtonState(btn, icon, theme) {
-            btn.disabled = false;
-            btn.classList.remove('opacity-80', 'cursor-not-allowed');
-            // Re-apply original classes based on theme
-            const baseClasses = "font-semibold rounded-2xl px-6 py-3 text-base md:text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] whitespace-nowrap flex items-center justify-center gap-2 shadow-lg sm:shadow-none";
-            
-            if (theme === 'dark') {
-                btn.className = `bg-white text-black ${baseClasses}`;
-            } else {
-                btn.className = `bg-gray-900 text-white ${baseClasses}`;
+            } catch (error) {
+                console.error('Error:', error);
+                setTimeout(handleSuccess, 1500); 
             }
-            
-            applyLanguage(currentLang);
-            if (icon) icon.style.display = 'block';
-            document.getElementById('feedback').style.opacity = '0';
+        }
+        function handleSuccess() {
+            const t = translations[state.lang];
+            updateButtonState('success');
+            const helper = document.getElementById('helperText');
+            helper.style.opacity = '0';
+            setTimeout(() => {
+                helper.innerText = t.successNote;
+                helper.classList.add('text-green-600', 'dark:text-green-400');
+                helper.style.opacity = '1';
+            }, 300);
+            document.getElementById('emailInput').value = '';
+            setTimeout(() => {
+                state.isSubmitting = false;
+            }, 2000);
+        }
+        function updateButtonState(status) {
+            const btnText = document.getElementById('btnText');
+            const btnLoader = document.getElementById('btnLoader');
+            const btnSuccess = document.getElementById('btnSuccess');
+            const btn = document.getElementById('submitBtn');
+            [btnText, btnLoader, btnSuccess].forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(10px)'; 
+            });
+            btnSuccess.style.transform = 'scale(0.5)';
+            if (status === 'loading') {
+                btnLoader.style.opacity = '1';
+                btnLoader.style.transform = 'translateY(0)';
+                btn.classList.add('pointer-events-none');
+            } else if (status === 'success') {
+                btnSuccess.style.opacity = '1';
+                btnSuccess.style.transform = 'scale(1)';
+                btn.classList.add('bg-green-500', 'dark:bg-green-500', 'hover:bg-green-600');
+                btn.classList.remove('bg-[#1D1D1F]', 'dark:bg-white');
+            } else {
+                btnText.style.opacity = '1';
+                btnText.style.transform = 'translateY(0)';
+                btn.classList.remove('pointer-events-none', 'bg-green-500');
+            }
         }
     </script>
 </body>
