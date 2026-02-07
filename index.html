@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en" class="dark h-full overflow-hidden">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Squirrel GO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+                    },
+                    colors: {
+                        accent: {
+                            DEFAULT: '#FF9F0A',
+                            glow: '#FFD60A',
+                        },
+                        surface: {
+                            light: '#ffffff',
+                            dark: '#121212', 
+                            cardLight: 'rgba(255, 255, 255, 0.6)',
+                            cardDark: 'rgba(28, 28, 30, 0.6)',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+        html, body { 
+            overflow: hidden; 
+            height: 100%;     
+            overscroll-behavior: none; 
+        }
+        body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px) scale(0.98);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            filter: blur(4px);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .dark .glass {
+            background: rgba(20, 20, 20, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #FF9F0A 0%, #FFD60A 50%, #FF9F0A 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 4s linear infinite;
+        }
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+        .ambient-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -1;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-[#F5F5F7] dark:bg-[#000000] text-gray-900 dark:text-[#F5F5F7] transition-colors duration-500 relative h-full flex flex-col justify-between">
+    <div class="ambient-glow bg-orange-500 top-[-200px] left-1/2 -translate-x-1/2"></div>
+    <div class="ambient-glow bg-blue-500 bottom-[-200px] right-[-100px] w-[400px] h-[400px]"></div>
+    <div class="fixed top-6 right-6 z-50 flex items-center gap-3">
+        <button onclick="toggleLanguage()" class="w-10 h-10 rounded-full bg-white/50 dark:bg-black/20 backdrop-blur-md border border-gray-200/50 dark:border-white/10 shadow-sm flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-300 hover:scale-105 hover:bg-white/80 dark:hover:bg-white/10 transition-all" id="langBtn">
+            中
+        </button>
+        <button onclick="toggleTheme()" class="w-10 h-10 rounded-full bg-white/50 dark:bg-black/20 backdrop-blur-md border border-gray-200/50 dark:border-white/10 shadow-sm flex items-center justify-center text-gray-600 dark:text-gray-300 hover:scale-105 hover:bg-white/80 dark:hover:bg-white/10 transition-all">
+            <i data-lucide="moon" class="w-4 h-4 hidden dark:block text-yellow-400 fill-yellow-400"></i>
+            <i data-lucide="sun" class="w-4 h-4 block dark:hidden text-orange-500 fill-orange-500"></i>
+        </button>
+    </div>
+    <main class="flex-grow flex flex-col items-center justify-center px-6 w-full max-w-7xl mx-auto h-full">
+        <div class="flex flex-col items-center text-center max-w-4xl mx-auto z-10">
+            <div class="reveal relative group mb-6 md:mb-8 animate-float">
+                <div class="absolute inset-0 bg-orange-500/30 blur-[40px] rounded-full scale-110 group-hover:scale-125 transition-transform duration-700"></div>
+                <div class="relative w-32 h-32 md:w-40 md:h-40 rounded-[2.2rem] overflow-hidden shadow-2xl bg-gradient-to-br from-gray-100 to-gray-300 dark:from-[#2c2c2e] dark:to-[#1c1c1e]">
+                    <img 
+                        src="icon.png" 
+                        alt="App Icon"
+                        class="w-full h-full object-cover"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                    >
+                    <div class="hidden w-full h-full flex flex-col items-center justify-center text-accent">
+                        <i data-lucide="nut" class="w-14 h-14 mb-2 stroke-[1.5]"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="reveal delay-100 space-y-3 md:space-y-4">
+                <h2 class="text-orange-600 dark:text-orange-500 font-semibold tracking-widest uppercase text-sm md:text-base" data-key="intro">
+                    Coming Soon
+                </h2>
+                <h1 class="text-5xl md:text-8xl font-bold tracking-tight text-gray-900 dark:text-white leading-[0.9]">
+                    <span data-key="appName" class="gradient-text">Squirrel GO</span>
+                </h1>
+                <p class="text-lg md:text-2xl text-gray-500 dark:text-gray-400 font-normal leading-relaxed max-w-xl mx-auto mt-4 md:mt-6" data-key="tagline">
+                    Transform Hong Kong into a virtual wilderness, where players discover diverse squirrel species!
+                </p>
+            </div>
+            <div id="waitlist-section" class="reveal delay-200 mt-8 md:mt-12 w-full max-w-md relative z-20">
+                <div class="glass p-2 rounded-[20px] flex flex-col sm:flex-row gap-2 shadow-xl shadow-orange-500/5">
+                    <input 
+                        type="email" 
+                        id="emailInput"
+                        placeholder="Enter your email" 
+                        class="flex-1 bg-transparent border-none outline-none px-4 py-3 text-lg text-gray-900 dark:text-white placeholder-gray-400 focus:ring-0 min-w-0"
+                        data-placeholder-key="emailPlaceholder"
+                    >
+                    <button 
+                        onclick="joinWaitlist()"
+                        class="bg-gray-900 dark:bg-white text-white dark:text-black font-semibold rounded-2xl px-6 py-3 text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] whitespace-nowrap flex items-center justify-center gap-2"
+                        id="joinBtn"
+                    >
+                        <span data-key="joinBtn">Join Waitlist</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                <div id="feedback" class="absolute top-full left-0 w-full mt-3 text-center text-sm font-medium h-5 opacity-0 transition-opacity duration-300"></div>
+            </div>
+        </div>
+    </main>
+    <footer class="py-6 text-center border-t border-gray-200/50 dark:border-white/5 glass w-full absolute bottom-0">
+        <div class="flex flex-col gap-1">
+            <p class="text-xs text-gray-400 dark:text-gray-600 tracking-wide">
+                <span data-key="copyright">© 2026 WYHK IDEEA 3K Group 1.</span>
+            </p>
+            <div class="flex items-center justify-center gap-2 text-[10px] text-gray-300 dark:text-gray-700 uppercase tracking-widest font-bold">
+                <span data-key="location">Made in Hong Kong</span>
+            </div>
+        </div>
+    </footer>
+    <script>
+        const translations = {
+            en: {
+                appName: "Squirrel GO",
+                navWaitlist: "Get Early Access",
+                intro: "Stay Tuned For",
+                tagline: "Transform Hong Kong into a virtual wilderness, where players discover diverse squirrel species!",
+                emailPlaceholder: "Email Address",
+                joinBtn: "Join Waitlist",
+                joinBtnLoading: "Processing...",
+                joinBtnSuccess: "You're In!",
+                feedbackError: "Please enter a valid email address.",
+                feedbackSuccess: "We've added you to the list!",
+                copyright: "© 2026 WYHK IDEEA 3K Group 1. All rights reserved.",
+                location: "Made in Hong Kong",
+                langBtnLabel: "中",
+            },
+            zh: {
+                appName: "Squirrel GO",
+                navWaitlist: "搶先體驗",
+                intro: "敬請期待",
+                tagline: "將香港打造成虛擬自然世界，讓玩家置身其中發掘各種松鼠品種！",
+                emailPlaceholder: "電子郵件地址",
+                joinBtn: "加入測試名單",
+                joinBtnLoading: "處理中...",
+                joinBtnSuccess: "成功加入",
+                feedbackError: "請輸入有效的電子郵件地址。",
+                feedbackSuccess: "已成功加入！我們將盡快通知您。",
+                copyright: "版權所有 © 2026 WYHK IDEEA 3K Group 1",
+                location: "香港製造",
+                langBtnLabel: "EN",
+            }
+        };
+        let currentLang = localStorage.getItem('lang') || 'en';
+        let currentTheme = localStorage.getItem('theme') || 'dark';
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) lucide.createIcons();
+            applyTheme(currentTheme);
+            applyLanguage(currentLang);
+            initScrollReveal();
+        });
+        function toggleTheme() {
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            applyTheme(currentTheme);
+        }
+        function applyTheme(theme) {
+            const html = document.documentElement;
+            if (theme === 'dark') html.classList.add('dark');
+            else html.classList.remove('dark');
+            localStorage.setItem('theme', theme);
+        }
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'zh' : 'en';
+            applyLanguage(currentLang);
+        }
+        function applyLanguage(lang) {
+            const t = translations[lang];
+            document.querySelectorAll('[data-key]').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (t[key]) el.innerText = t[key];
+            });
+            document.querySelectorAll('[data-placeholder-key]').forEach(el => {
+                const key = el.getAttribute('data-placeholder-key');
+                if (t[key]) el.placeholder = t[key];
+            });
+            document.getElementById('langBtn').innerText = t.langBtnLabel;
+            localStorage.setItem('lang', lang);
+        }
+        function initScrollReveal() {
+            const reveals = document.querySelectorAll('.reveal');
+            const checkReveal = () => {
+                const triggerBottom = window.innerHeight * 0.95;
+                reveals.forEach(reveal => {
+                    const boxTop = reveal.getBoundingClientRect().top;
+                    if (boxTop < triggerBottom) reveal.classList.add('active');
+                });
+            };
+            setTimeout(checkReveal, 100);
+        }
+        function joinWaitlist() {
+            const input = document.getElementById('emailInput');
+            const feedback = document.getElementById('feedback');
+            const btn = document.getElementById('joinBtn');
+            const span = btn.querySelector('span');
+            const icon = btn.querySelector('svg') || btn.querySelector('i'); 
+            const t = translations[currentLang];
+            const email = input.value;
+            feedback.style.opacity = '0';
+            input.classList.remove('border-red-500', 'text-red-500');
+            if (!email || !email.includes('@')) {
+                feedback.textContent = t.feedbackError;
+                feedback.style.color = "#ef4444";
+                feedback.style.opacity = "1";
+                return;
+            }
+            const originalText = span.innerText;
+            span.innerText = t.joinBtnLoading;
+            if (icon) icon.style.display = 'none'; 
+            btn.disabled = true;
+            btn.classList.add('opacity-80', 'cursor-not-allowed');
+            fetch("https://formspree.io/f/mbdajrll", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({ email: email })
+            })
+            .then(response => {
+                if (response.ok) {
+                    span.innerText = t.joinBtnSuccess;
+                    btn.className = "bg-green-500 text-white font-semibold rounded-2xl px-6 py-3 text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] whitespace-nowrap flex items-center justify-center gap-2";
+                    feedback.textContent = t.feedbackSuccess;
+                    feedback.style.color = "#22c55e";
+                    feedback.style.opacity = "1";
+                    input.value = ""; 
+                    setTimeout(() => {
+                        resetButtonState(btn, icon, currentTheme);
+                    }, 3000);
+                } else {
+                    response.json().then(data => {
+                        if (Object.hasOwn(data, 'errors')) {
+                            feedback.textContent = data.errors.map(error => error.message).join(", ");
+                        } else {
+                            feedback.textContent = "Oops! Problem submitting form.";
+                        }
+                        feedback.style.color = "#ef4444";
+                        feedback.style.opacity = "1";
+                        resetButtonState(btn, icon, currentTheme);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("Fetch Error:", error);
+                feedback.textContent = "Network error. Please try again.";
+                feedback.style.color = "#ef4444";
+                feedback.style.opacity = "1";
+                resetButtonState(btn, icon, currentTheme);
+            });
+        }
+        function resetButtonState(btn, icon, theme) {
+            btn.disabled = false;
+            btn.classList.remove('opacity-80', 'cursor-not-allowed');
+            if (theme === 'dark') {
+                btn.className = "bg-white text-black font-semibold rounded-2xl px-6 py-3 text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] whitespace-nowrap flex items-center justify-center gap-2";
+            } else {
+                btn.className = "bg-gray-900 text-white font-semibold rounded-2xl px-6 py-3 text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] whitespace-nowrap flex items-center justify-center gap-2";
+            }
+            applyLanguage(currentLang);
+            if (icon) icon.style.display = 'block';
+            document.getElementById('feedback').style.opacity = '0';
+        }
+    </script>
+</body>
+</html>
